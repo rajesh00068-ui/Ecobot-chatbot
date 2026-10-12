@@ -1,0 +1,49 @@
+import os
+!pip -q install gradio
+
+import gradio as gr
+
+def chatbot(message, history):
+    item = message.lower().strip()
+
+    bins = {
+        "banana peel": ("🟢 GREEN BIN", "Wet/organic waste"),
+        "vegetable peel": ("🟢 GREEN BIN", "Wet/organic waste"),
+        "leftover food": ("🟢 GREEN BIN", "Wet/organic waste"),
+        "paper": ("🔵 BLUE BIN", "Dry recyclable waste"),
+        "cardboard": ("🔵 BLUE BIN", "Dry recyclable waste"),
+        "plastic bottle": ("🔵 BLUE BIN", "Dry recyclable waste, if accepted"),
+        "glass bottle": ("🔵 BLUE BIN", "Glass recycling, if accepted"),
+        "battery": ("⚠️ SPECIAL COLLECTION", "Take to an authorised battery collection point"),
+        "mobile phone": ("⚠️ E-WASTE COLLECTION", "Take to an authorised e-waste collection point")
+    }
+
+    for waste, result in bins.items():
+        if waste in item:
+            return (
+                f"♻️ Recommended: {result[0]}\n\n"
+                f"Category: {result[1]}\n\n"
+                "Note: Local bin colours and rules may vary."
+            )
+
+    return (
+        "I don't know this item yet. Please check your local "
+        "waste segregation guidelines."
+    )
+
+demo = gr.ChatInterface(
+    fn=chatbot,
+    title="🌱 EcoBot",
+    description="Smart Waste Segregation Assistant",
+    examples=[
+        "Banana peel",
+        "Plastic bottle",
+        "Leftover food",
+        "Battery"
+    ]
+)
+
+demo.launch(
+    server_name="0.0.0.0",
+    server_port=int(os.environ.get("PORT", "10000"))
+)
